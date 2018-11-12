@@ -26,26 +26,9 @@ db = redis.StrictRedis(host=config['DB']['host'],
                        db=config['DB']['db'])
 
 
-def user_language(func):
-    @wraps(func)
-    def wrapped(bot, update, *args, **kwargs):
-        lang = db.get(str(update.message.chat_id))
-
-        global _
-
-        if lang == b"pt_BR":
-            # Se a linguagem e pt_BR traduz
-            _ = lang_pt.gettext
-        else:
-            # caso não, deixa em en_US
-            def _(msg): return msg
-
-        result = func(bot, update, *args, **kwargs)
-        return result
-    return wrapped
 
 
-@user_language
+
 def start(bot, update):
     """
         Mostra uma mensagem de bem vindo e demonstra os comandos
@@ -72,7 +55,7 @@ def start(bot, update):
                      reply_markup=reply_kb_markup)
 
 
-@user_language
+
 def support(bot, update):
     """
         Envia uma mensagem de suporte. Um tipo de "Como posso te ajudar?".
@@ -81,7 +64,7 @@ def support(bot, update):
                      text=_("Por favor, diga me o que você precisa :)"))
 
 
-@user_language
+
 def support_message(bot, update):
     """
         Recebe a mensagem do usuario
@@ -106,7 +89,7 @@ def support_message(bot, update):
                          text=_("De-me um tempo para pensar, em breve virei com uma resposta para lhe dar."))
 
 
-@user_language
+
 def settings(bot, update):
     """
         Configura a linguagem das mensagem usando um teclado customizado.
@@ -131,7 +114,7 @@ def settings(bot, update):
                      reply_markup=reply_kb_markup)
 
 
-@user_language
+
 def kb_settings_select(bot, update, groups):
     """
         Atualiza a linguagem do usuario baseado em sua escolha
@@ -156,7 +139,7 @@ def kb_settings_select(bot, update, groups):
                          text=_("Linguagem desconhecida! :("))
 
 
-@user_language
+
 def unknown(bot, update):
     """
         Commando de amostra, para caso o usuario mandar uma mensagem invalida..
@@ -164,7 +147,6 @@ def unknown(bot, update):
     msg = _("Desculpe, eu não compreendi o que você pediu.")
     bot.send_message(chat_id=update.message.chat_id,
                      text=msg)
-
 # Criando apoios
 start_handler = CommandHandler('start', start)
 support_handler = CommandHandler('support', support)
@@ -190,4 +172,4 @@ dispatcher.add_handler(support_msg_handler)
 # Para rodar esse programa:
 updater.start_polling()
 # Para para-lo:
-# updater.stop()
+#updater.stop()
