@@ -3,6 +3,7 @@ import telegram
 import redis
 import gettext
 import configparser
+import logging
 
 from functools import wraps
 from telegram.ext import Updater, CommandHandler, MessageHandler,\
@@ -11,6 +12,9 @@ from telegram.ext import Updater, CommandHandler, MessageHandler,\
 # Configurando o bot
 config = configparser.ConfigParser()
 config.read_file(open('config.ini'))
+
+# Contador 
+#contador = 1
 
 # Conectando ao API do telegram
 # Updater recebe informação e dispatcher conecta comandos
@@ -67,7 +71,7 @@ def support(bot, update):
 
 def support_message(bot, update):
     """
-        Recebe a mensagem do usuario
+        Recebe a mensagem do usua
         Se a mensagem e uma resposta do usuario, o bot 
         fala-ra com o usuario mandando o conteudo 
         da mensagem. Se a mensagem é um pedido do usuario 
@@ -84,9 +88,16 @@ def support_message(bot, update):
         # para o grupo de suporte
         bot.forward_message(chat_id=int(config['DEFAULT']['support_chat_id']),
                             from_chat_id=update.message.chat_id,
-                            message_id=update.message.message_id)
+                            message_id=update.message.message_id)                            
         bot.send_message(chat_id=update.message.chat_id,
                          text=_("De-me um tempo para pensar, em breve virei com uma resposta para lhe dar."))
+        escreve_log(str(update.message.text), str(update.message.chat_id))
+      
+
+def escreve_log(mensagem, id):
+     log = open('log.txt', 'a').write("| " + "usuario " + ': ' + id + ' | Pergunta: ' + mensagem + ' | \n')
+     log.close()
+
 
 
 
@@ -149,6 +160,7 @@ def unknown(bot, update):
                      text=msg)
 # Criando apoios
 start_handler = CommandHandler('start', start)
+#contador = 1
 support_handler = CommandHandler('support', support)
 support_msg_handler = MessageHandler([Filters.text], support_message)
 settings_handler = CommandHandler('settings', settings)
@@ -169,7 +181,10 @@ dispatcher.add_handler(unknown_handler)
 # O apoio de mensagem deve ser o ultimo
 dispatcher.add_handler(support_msg_handler)
 
+
+
 # Para rodar esse programa:
 updater.start_polling()
+#contador+=1
 # Para para-lo:
 #updater.stop()
